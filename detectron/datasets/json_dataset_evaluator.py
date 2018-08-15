@@ -89,6 +89,7 @@ def _coco_segms_results_one_category(json_dataset, boxes, segms, cat_id):
     results = []
     image_ids = json_dataset.COCO.getImgIds()
     image_ids.sort()
+    #image_ids=image_ids[0:300]
     assert len(boxes) == len(image_ids)
     assert len(segms) == len(image_ids)
     for i, image_id in enumerate(image_ids):
@@ -168,6 +169,7 @@ def _coco_bbox_results_one_category(json_dataset, boxes, cat_id):
     results = []
     image_ids = json_dataset.COCO.getImgIds()
     image_ids.sort()
+    #image_ids=image_ids[0:300]
     assert len(boxes) == len(image_ids)
     for i, image_id in enumerate(image_ids):
         dets = boxes[i]

@@ -60,7 +60,7 @@ def evaluate_all(
         dataset, all_boxes, output_dir, use_matlab=use_matlab
     )
     logger.info('Evaluating bounding boxes is done!')
-    if cfg.MODEL.MASK_ON:
+    if True:#cfg.MODEL.MASK_ON:
         results = evaluate_masks(dataset, all_boxes, all_segms, output_dir)
         all_results[dataset.name].update(results[dataset.name])
         logger.info('Evaluating segmentations is done!')
