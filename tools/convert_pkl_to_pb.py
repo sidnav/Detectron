@@ -342,7 +342,7 @@ def add_bbox_ops(args, net, blobs):
     net.Proto().external_output.extend(new_external_outputs)
 
 
-def convert_model_gpu(args, net, init_net):
+def convert_model_gpu(args, net, init_net,a):
     assert args.device == 'gpu'
 
     ret_net = copy.deepcopy(net)
@@ -377,9 +377,10 @@ def convert_model_gpu(args, net, init_net):
 
     convert_op_in_proto(ret_init_net.Proto(), convert_init_op_gpu)
     convert_op_in_proto(ret_net.Proto(), convert_op_gpu)
-
-    ret = core.InjectDeviceCopiesAmongNets([ret_init_net, ret_net])
-
+    if a==1:
+        ret = core.InjectDeviceCopiesAmongNets([ret_init_net, ret_net])
+    else:
+        ret =[[ret_init_net,ret_net]]
     return [ret[0][1], ret[0][0]]
 
 
@@ -691,6 +692,7 @@ def verify_model(args, models_pb, test_img_file):
     print('Checking models...')
     assert mutils.compare_model(
         _run_cfg_func, _run_pb_func, test_img, check_blobs)
+    
 
 
 def convert_to_pb(args, net, blobs, part_name='net', input_blobs=[]):
@@ -708,7 +710,8 @@ def convert_to_pb(args, net, blobs, part_name='net', input_blobs=[]):
     convert_net(args, pb_net.Proto(), blobs)
 
     # add operators for bbox
-    add_bbox_ops(args, pb_net, blobs)
+    if(part_name=='net'):
+        add_bbox_ops(args, pb_net, blobs)
 
     if args.fuse_af:
         print('Fusing affine channel...')
@@ -721,7 +724,10 @@ def convert_to_pb(args, net, blobs, part_name='net', input_blobs=[]):
     pb_init_net = gen_init_net(pb_net, blobs, input_blobs)
 
     if args.device == 'gpu':
-        [pb_net, pb_init_net] = convert_model_gpu(args, pb_net, pb_init_net)
+        if(part_name=='mask_net'):
+            [pb_net, pb_init_net] = convert_model_gpu(args, pb_net, pb_init_net,0)
+        else:
+            [pb_net, pb_init_net] = convert_model_gpu(args, pb_net, pb_init_net,1)
 
     pb_net.Proto().name = args.net_name + '_' + part_name
     pb_init_net.Proto().name = args.net_name + '_' + part_name + '_init'
